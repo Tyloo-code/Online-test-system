@@ -2,30 +2,30 @@
   <div class="app-container">
     <div class="func-list">
       <div class="left search-group">
-                <el-select v-model="tree.courses" placeholder="请选择课程" class="input">
-                            <el-option
-                                v-for="item in coursesList"
-                                :key="item.classes"
-                                :label="item.classes"
-                                :value="item.classes">
-                            </el-option>
-                </el-select>
-                <el-select v-model="tree.classes" placeholder="请选择班级" class="input">
-                            <el-option
-                                v-for="item in classList"
-                                :key="item.classes"
-                                :label="item.classes"
-                                :value="item.classes">
-                            </el-option>
-                </el-select>
-                <el-input placeholder="请输入学号" v-model="tree.studentNum" class="input"></el-input>
-                <el-input placeholder="请输入姓名" v-model="tree.studentName" class="input"></el-input>
-                <el-button @click="handleSearch" class="button">查询</el-button>
+        <el-select v-model="tree.courses" placeholder="请选择课程" class="input">
+          <el-option
+            v-for="item in courselist"
+            :key="item.classes"
+            :label="item.classes"
+            :value="item.name"
+          ></el-option>
+        </el-select>
+        <el-select v-model="tree.classes" placeholder="请选择班级" class="input">
+          <el-option
+            v-for="item in classlist"
+            :key="item.classes"
+            :label="item.classes"
+            :value="item.name"
+          ></el-option>
+        </el-select>
+        <el-input placeholder="请输入学号" v-model="tree.studentNum" class="input"></el-input>
+        <el-input placeholder="请输入姓名" v-model="tree.studentName" class="input"></el-input>
+        <el-button @click="handleSearch" class="button">查询</el-button>
       </div>
       <div class="right">
-                <el-button type="primary" icon="el-icon-folder-add" @click="handleAdd">导出</el-button>
-                <!-- v-if="role === 'Administrator' || role === 'Supervisor'" -->
-                <!-- <el-button type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
+        <el-button type="primary" icon="el-icon-folder-add" @click="handleAdd">导出</el-button>
+        <!-- v-if="role === 'Administrator' || role === 'Supervisor'" -->
+        <!-- <el-button type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
       </div>
     </div>
 
@@ -38,14 +38,10 @@
       highlight-current-row
     >
       <el-table-column align="center" label="课程" width="120">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
+        <template slot-scope="scope">{{ scope.$index }}</template>
       </el-table-column>
       <el-table-column label="学期" width="200" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.title }}</template>
       </el-table-column>
       <el-table-column label="班级" width="120" align="center">
         <template slot-scope="scope">
@@ -53,24 +49,16 @@
         </template>
       </el-table-column>
       <el-table-column label="学号" width="120" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
       </el-table-column>
       <el-table-column label="姓名" width="120" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
       </el-table-column>
       <el-table-column label="题目" width="300" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
       </el-table-column>
       <el-table-column label="实验报告" width="300" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
       </el-table-column>
       <el-table-column class-name="status-col" label="分数" align="center">
         <template slot-scope="scope">
@@ -87,35 +75,54 @@
 </template>
 
 <script>
+import { classList, coueseList } from "@/api/menu";
 export default {
-  name: 'Tree',
+  name: "Tree",
   data() {
     return {
+      courselist: [],
+      classlist: [],
       tree: {
-        courses: '',
-        classes: '',
-        studentNum: '',
-        studentName: '',
-        terms: ''
-      },
-    }
+        courses: "",
+        classes: "",
+        studentNum: "",
+        studentName: "",
+        terms: ""
+      }
+    };
+  },
+  created() {
+    this.fetchData();
   },
   methods: {
+    fetchData() {
+      /* this.listLoading = true;
+      getList().then(response => {
+        this.list = response.value;
+        this.listLoading = false;
+      }); */
+      classList().then(response => {
+        this.classlist = response.data;
+      });
+      coueseList().then(response => {
+        this.courselist = response.value;
+      });
+    }
   }
-}
+};
 </script>
 <style lang="scss" scoped>
 .search-group {
   width: 750px;
-    .input {
-        width: 150px;
-        float: left !important;
-        margin-right: 5px;
-    }
-    .button {
-        color: #fff;
-        background-color: #409eff;
-    }
+  .input {
+    width: 150px;
+    float: left !important;
+    margin-right: 5px;
+  }
+  .button {
+    color: #fff;
+    background-color: #409eff;
+  }
 }
 .func-list {
   margin-bottom: 20px;
