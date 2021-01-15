@@ -67,6 +67,18 @@ export const constantRoutes = [
   },
 
   {
+    path: '/dRouting/:id',
+    name: 'dRouting',
+    component: () => import('@/views/dRouting/index'),
+  },
+
+  {
+    path: '/xSheng/:id',
+    name: 'xSheng',
+    component: () => import('@/views/xSheng/index'),
+  },
+
+  {
     path: '/form',
     component: Layout,
     children: [

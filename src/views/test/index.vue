@@ -1,7 +1,6 @@
 <template>
   <div>
      <div v-html="this.$route.params.content"></div>
-   
   </div>
 </template>
 

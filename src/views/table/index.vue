@@ -38,7 +38,7 @@
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
           <!-- <router-link :to="'/example/edit/'+scope.row.id"> -->
-          <el-button>编辑</el-button>
+          <el-button @click="dRouting(scope.row)">编辑</el-button>
           <!-- </router-link> -->
           <el-button @click="handledelete(scope.row.id)">删除</el-button>
         </template>
@@ -74,6 +74,7 @@ export default {
   }, */
   data() {
     return {
+      id:null,
       courselist: null,
       list: null,
       listLoading: true,
@@ -91,6 +92,11 @@ export default {
         this.$message.success(`删除成功`)
         this.fetchData()
       })
+    },
+    dRouting(scope){
+      console.log(scope)
+      var id = scope.id
+      this.$router.push({path:`/dRouting/${id}`,params:{id:id}})
     },
     handleSearch() {},
     fetchData() {

@@ -221,8 +221,8 @@ export default {
     },
     closeEditDialog() {},
     toTest() {
-      console.log(this.report);
-      this.$router.push({ name: "Test", params: { content: this.report } });
+      console.log(this.quiz.markdown);
+      this.$router.push({ name: "Test", params: { content: this.quiz.markdown } });
     },
     fetchData() {
       coueseList().then(response => {
