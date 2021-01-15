@@ -45,29 +45,31 @@
       </el-table-column>
       <el-table-column label="班级" width="120" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.student.class.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="学号" width="120" align="center">
-        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
+        <template slot-scope="scope">{{ scope.row.student.id }}</template>
       </el-table-column>
       <el-table-column label="姓名" width="120" align="center">
-        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
+        <template slot-scope="scope">{{ scope.row.student.name }}</template>
       </el-table-column>
       <el-table-column label="题目" width="300" align="center">
-        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
+        <template slot-scope="scope">{{ scope.row.question.quiz.name }}</template>
       </el-table-column>
       <el-table-column label="实验报告" width="300" align="center">
-        <template slot-scope="scope">{{ scope.row.pageviews }}</template>
+        <template slot-scope="scope">{{ scope.row.answer }}</template>
       </el-table-column>
       <el-table-column class-name="status-col" label="分数" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+         <!--  <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag> -->
+         {{ scope.row.score }}
         </template>
       </el-table-column>
       <el-table-column align="center" prop="created_at" label="修改">
-        <template>
-          <el-button>修改</el-button>
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.edit">确认</el-button>
+          <el-button v-else @click="scope.row.edit=!scope.row.edit">修改</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -75,11 +77,14 @@
 </template>
 
 <script>
+import { getList } from "@/api/tree";
 import { classList, coueseList } from "@/api/menu";
 export default {
   name: "Tree",
   data() {
     return {
+      list: null,
+      listLoading: true,
       courselist: [],
       classlist: [],
       tree: {
@@ -95,14 +100,16 @@ export default {
     this.fetchData();
   },
   methods: {
+    handleSearch() {},
+    handleAdd() {},
     fetchData() {
-      /* this.listLoading = true;
+      this.listLoading = true;
       getList().then(response => {
         this.list = response.value;
         this.listLoading = false;
-      }); */
+      });
       classList().then(response => {
-        this.classlist = response.data;
+        this.classlist = response.value;
       });
       coueseList().then(response => {
         this.courselist = response.value;

@@ -1,21 +1,13 @@
 import request from '@/utils/request'
 
-export function getList(params) {
+export function getquizzes(odatamark) {
   return request({
-    url: 'http://podolski.cn:5000/api/Classes',
-    method: 'get',
-    params
-  })
-}
-
-export function getodataList(odataroute) {
-  return request({
-    url: 'http://podolski.cn:5000/api/Classes?$filter='+ odataroute,
+    url: 'http://podolski.cn:5000/api/Quizzes?$filter=markdown eq \''+ odatamark  + '\'',
     method: 'get'
   })
 }
 
-export function postList(data) {
+export function putquizzes(data) {
   return request({
     url: 'http://podolski.cn:5000/api/Quizzes',
     method: 'put',
@@ -23,17 +15,11 @@ export function postList(data) {
   })
 }
 
-export function postList(data) {
+export function putquestions(data) {
   return request({
     url: 'http://podolski.cn:5000/api/Questions',
     method: 'put',
     data
-  })
-}
-export function deleteList(id) {
-  return request({
-    url: `http://podolski.cn:5000/api/Classes(${id})`,
-    method: 'delete'
   })
 }
 

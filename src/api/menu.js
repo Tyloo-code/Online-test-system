@@ -15,3 +15,12 @@ export function coueseList(params) {
       params
     })
   }
+
+//题目类型
+export function questiontype(params) {
+  return request({
+    url: 'http://podolski.cn:5000/api/QuestionTypes',
+    method: 'get',
+    params
+  })
+}

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div class="func-list">
+    <!-- <div class="func-list">
       <div class="left search-group">
                 <el-select v-model="table.courses" placeholder="请选择课程" class="input">
                             <el-option
@@ -12,7 +12,7 @@
                 </el-select>
                 <el-button @click="handleSearch" class="button">查询</el-button>
       </div>
-    </div>
+    </div> -->
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -41,6 +41,11 @@
           <span>{{ scope.row.markdown }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="状态" width="110" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.markdown }}</span>
+        </template>
+      </el-table-column>
       <!-- <el-table-column class-name="status-col" label="Status" width="110" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
@@ -57,7 +62,9 @@
 </template>
 
 <script>
+import { getList } from "@/api/tree";
 export default {
+  name: 'Homework',
   /*filters: {
      statusFilter(status) {
       const statusMap = {

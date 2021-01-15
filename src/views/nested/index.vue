@@ -6,8 +6,8 @@
           <el-option
             v-for="item in courselist"
             :key="item.classes"
-            :label="item.classes"
-            :value="item.name"
+            :label="item.name"
+            :value="item.id"
           ></el-option>
         </el-select>
         <!-- <el-input placeholder="请输入学号" class="input"></el-input> -->
@@ -15,7 +15,7 @@
           <el-option
             v-for="item in classlist"
             :key="item.classes"
-            :label="item.classes"
+            :label="item.name"
             :value="item.id"
           ></el-option>
         </el-select>
@@ -40,14 +40,14 @@
       highlight-current-row
     >
       <el-table-column label="课程" align="center" width="370">
-        <template slot-scope="scope">{{ scope.row.name }}</template>
+        <template slot-scope="scope">{{ scope.row.course.name }}</template>
       </el-table-column>
       <el-table-column label="学期" width="370" align="center">
-        <template slot-scope="scope">{{ scope.row.term }}</template>
+        <template slot-scope="scope">{{ scope.row.course.term }}</template>
       </el-table-column>
       <el-table-column label="班级" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.class }}</span>
+          <span>{{ scope.row.class.name }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column label="学号" width="260" align="center">
@@ -85,12 +85,12 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="班级选择" label-width="100px" prop="classes">
-          <el-select v-model="nested.classes" multiple placeholder="请选择班级" class="input">
+          <el-select v-model="classcourse.classId" multiple placeholder="请选择班级" class="input">
             <el-option
               v-for="item in classlist"
-              :key="item.classes"
-              :label="item.classes"
-              :value="item.name"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -120,7 +120,7 @@
   </div>
 </template>
 <script>
-import { getList, postList, deleteList } from "@/api/nested";
+import { getList, postList, deleteList,getodataList } from "@/api/nested";
 import { classList, coueseList } from "@/api/menu";
 export default {
   name: "Nested",
@@ -131,6 +131,9 @@ export default {
       nested: {
         name: "",
         term: ""
+      },
+      classcourse: {
+        classId:''
       },
       form: {
         classes: "",
@@ -170,33 +173,22 @@ export default {
     },
     handleSearch() {
       let odatarout = "";
-      if (this.form.classId != null) {
-        if (this.form.name != "") {
-          if (this.form.id != null) {
-            odatarout =
-              "classId eq " +
-              this.form.classId +
-              "&name eq '" +
-              this.form.name +
-              "'&id eq " +
-              this.form.id;
-          } else {
-            odatarout =
-              "classId eq " +
-              this.form.classId +
-              "name eq '" +
-              this.form.name +
-              "'";
+      if (this.form.courses != "") {
+        odatarout = '&$filter=' + 'courseId eq '+this.form.courses
+        }
+      if (this.form.classes != "") {
+          if(odatarout != ''){
+            odatarout = odatarout + ' and classId eq ' + this.form.classes
           }
-        } else {
-          odatarout = "classId eq " + this.form.classId;
+          else {
+            odatarout = '&$filter=' + 'classId eq ' + this.form.classes
+          }
         }
         this.listLoading = true;
         getodataList(odatarout).then(response => {
           this.list = response.value;
           this.listLoading = false;
         });
-      }
     },
     submitEdit() {
       this.$refs["dataForm"].validate(valid => {
@@ -223,7 +215,7 @@ export default {
         this.listLoading = false;
       });
       classList().then(response => {
-        this.classlist = response.data;
+        this.classlist = response.value;
       });
       coueseList().then(response => {
         this.courselist = response.value;

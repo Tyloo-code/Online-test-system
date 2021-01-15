@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="题目">
-        <el-input type="edit" placeholder="请输入实验题目" v-model="topic" style="width: 600px"></el-input>
+        <el-input type="edit" placeholder="请输入实验题目" v-model="quiz.name" style="width: 600px"></el-input>
       </el-form-item>
     </el-form>
     <el-button @click="addtopic">插入题目</el-button>
@@ -26,18 +26,19 @@
               <template slot="title">第{{ index+1 }}题答案</template>
               <el-form-item label="题目类型" label-width="110px">
                 <el-radio-group v-model="item.type">
-                  <el-radio label="填空">填空</el-radio>
+                <el-radio v-for="(items) in questiontype" :key="items.id" :label="items.id">{{items.type}}</el-radio>
+                  <!-- <el-radio label="填空">填空</el-radio>
                   <el-radio label="简答">简答</el-radio>
                   <el-radio label="图">图</el-radio>
-                  <el-radio label="表格">表格</el-radio>
+                  <el-radio label="表格">表格</el-radio> -->
                 </el-radio-group>
               </el-form-item>
-              <el-form-item v-show="item.type=='表格'">
-                <el-input placeholder="请输入表格行数" />
-                <el-input placeholder="请输入表格列数" />
+              <el-form-item v-show="item.type==3" label="表格行列数">
+                <el-input v-model="item.row" style="width:258px" placeholder="请输入表格行数" />
+                <el-input v-model="item.column" style="width:258px" placeholder="请输入表格列数" />
               </el-form-item>
               <el-form-item
-                v-show="item.type!='图'"
+                v-show="item.type!=2"
                 label="参考答案"
                 label-width="110px"
                 prop="fleetNum"
@@ -50,17 +51,12 @@
                 />
               </el-form-item>
               <el-form-item
-                v-show="item.type=='图'"
+                v-show="item.type==2"
                 label="参考答案"
                 label-width="110px"
                 prop="fleetNum"
               >
-                <el-input
-                  v-model="item.answer"
-                  type="edit"
-                  style="width:258px"
-                  placeholder="请填写参考答案"
-                />
+              <el-button>上传图片</el-button>
               </el-form-item>
               <el-button @click="removetopic">删除题目</el-button>
             </el-collapse-item>
@@ -68,7 +64,7 @@
         </div>
       </vuedraggable>
     </el-form>
-    <editor-bar v-model="report" :isClear="isClear" @change="change" />
+    <editor-bar v-model="quiz.markdown" :isClear="isClear" @change="change" />
 
     <!-- <mavon-editor style="height: 100%" v-model="report"></mavon-editor> -->
     <div>
@@ -102,7 +98,8 @@ import vuedraggable from "vuedraggable";
 import { mavonEditor } from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
 import EditorBar from "../../components/WangEnduit/index";
-import { coueseList } from "@/api/menu";
+import { coueseList, questiontype } from "@/api/menu";
+import { putquizzes,getquizzes,putquestions } from '@/api/dashboard'
 
 const content = ``;
 
@@ -116,9 +113,17 @@ export default {
   },
   data() {
     return {
+      i:Number,
       quiz: {
-        type: "",
-        answer: ""
+        name:'',
+        markdown: ''
+      },
+      question: {
+        standardAnswer:'',
+        questionTypeId:null,
+        quizId:null,
+        row: null,
+        column: null
       },
       isClear: false,
       detail: "",
@@ -145,8 +150,10 @@ export default {
       this.$refs.modelForm.clearValidate();
     },
     addtopic() {
-      this.report = this.report + "(问题)";
       this.modelForm.topic.push({ type: "", answer: "" });
+      var inde = this.modelForm.topic.length 
+      this.quiz.markdown = this.quiz.markdown + '[问题' + inde + ']';
+      
       /* this.editDialog = {
                         title: '新增题目',
                         visible: true,
@@ -161,8 +168,53 @@ export default {
       this.report = this.report + "[填空]";
     },
     addanswer() {},
+    getquizid(odatamark) {
+      getquizzes(odatamark).then(response => {
+        this.ceshi = response.value[0]
+        console.log('guoyi')
+        for (let j in this.ceshi) {
+          this.question.quizId = this.ceshi[j]
+          console.log(this.question.quizId)
+          break
+        }
+      console.log(this.question.quizId)
+      if(this.modelForm.topic[0].type==3) {
+        this.question.row = this.modelForm.topic[0].row
+        this.question.column = this.modelForm.topic[0].column
+      }
+      this.question.questionTypeId = this.modelForm.topic[0].type
+      this.question.standardAnswer = this.modelForm.topic[0].answer
+      this.i = 0
+      this.submitquestion()
+      })
+    },
+    submitquestion() {
+        putquestions(this.question).then(response => {
+        this.$message.success(`问题保存成功`);
+        if(this.i<this.modelForm.topic.length){
+          this.i=this.i+1;
+          if(this.modelForm.topic[this.i].type==3) {
+          this.question.row = this.modelForm.topic[this.i].row
+          this.question.column = this.modelForm.topic[this.i].column
+      }
+          console.log(this.i)
+          this.question.questionTypeId = this.modelForm.topic[this.i].type
+          this.question.standardAnswer = this.modelForm.topic[this.i].answer
+          console.log(this.question.questionTypeId)
+          console.log(this.question.standardAnswer)
+          console.log(this.question.quizId)
+          this.submitquestion()
+        }
+      })
+      
+    },
     submit() {
       console.log(this.modelForm);
+      putquizzes(this.quiz).then(response => {
+        this.$message.success(`保存成功`);
+        let odatamark = this.quiz.markdown
+      this.getquizid(odatamark)
+      })
     },
     change(val) {
       console.log(val);
@@ -175,6 +227,9 @@ export default {
     fetchData() {
       coueseList().then(response => {
         this.courses = response.value;
+      });
+      questiontype().then(response => {
+        this.questiontype = response.value;
       });
     }
   }

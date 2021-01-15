@@ -6,7 +6,7 @@
                             <el-option
                                 v-for="item in classlist"
                                 :key="item.classes"
-                                :label="item.classes"
+                                :label="item.name"
                                 :value="item.id">
                             </el-option>
                 </el-select>
@@ -32,7 +32,7 @@
     >
       <el-table-column align="center" label="班级" width="260">
         <template slot-scope="scope">
-          {{ scope.row.classId }}
+          {{ scope.row.class.name }}
         </template>
       </el-table-column>
       <el-table-column label="姓名" width="260" align="center">
@@ -47,7 +47,7 @@
       </el-table-column>
       <el-table-column label="用户名" width="260" align="center">
         <template slot-scope="scope">
-          {{ scope.row.userName }}
+          {{ scope.row.id }}
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" label="密码" width="260" align="center">
@@ -100,7 +100,7 @@
                             <el-option
                                 v-for="item in classlist"
                                 :key="item.classes"
-                                :label="item.classes"
+                                :label="item.name"
                                 :value="item.id">
                             </el-option>
                 </el-select>
@@ -189,25 +189,35 @@ export default {
       })
       }, */
       handleSearch() {
+        console.log(this.form.classId)
         let odatarout = ''
         if(this.form.classId != null) {
-          if(this.form.name != '') {
-            if(this.form.id != null) {
-              odatarout = 'classId eq '+this.form.classId + '&name eq \'' + this.form.name + '\'&id eq ' + this.form.id
-            }
-            else {
-              odatarout = 'classId eq '+this.form.classId + 'name eq \'' + this.form.name + '\''
-            }
+          odatarout = '&$filter=' + 'classId eq '+this.form.classId
+        }
+        if(this.form.name != '') {
+          if(odatarout != ''){
+            odatarout = odatarout + ' and name eq \'' + this.form.name + '\''
           }
           else {
-            odatarout = 'classId eq '+this.form.classId
+            odatarout = '&$filter=' + 'name eq \'' + this.form.name + '\''
           }
+          
+        }
+        if(this.form.id != null) {
+          if(odatarout != '') {
+            odatarout = odatarout + ' and id eq ' + this.form.id
+          }
+          else {
+            odatarout = '&$filter=' + 'id eq ' + this.form.id
+          }
+        }
+        console.log(odatarout)
           this.listLoading = true
         getodataList(odatarout).then(response => {
           this.list = response.value
           this.listLoading = false
         })
-        }
+        
       },
       handleAdd() {
         this.editDialog = {
@@ -227,19 +237,18 @@ export default {
           this.$refs['dataForm'].validate(valid => {
               if (valid) {
                   postList(this.temp).then(() => {
-          this.editDialog.visible = false;
-          this.fetchData();
-          this.$message.success(`添加成功`);
+                    this.editDialog.visible = false;
+                    this.$message.success(`添加成功`);
+                    let fileFormData = new FormData();
+                    fileFormData.append('file', this.files, this.fileName);  // 上传的文件
+                    fileFormData.append('fileName', this.newUploadForm.fileName); // 文件名
+                    postfile(fileFormData).then(res => { // 上传请求
+                      this.fileName = ''; 
+                      this.$message.success(`上传成功`);
+                      this.fetchData();
+               })
           })
-          /* let fileFormData = new FormData();
-                fileFormData.append('file', this.files, this.fileName);  // 上传的文件
-                fileFormData.append('fileName', this.newUploadForm.fileName); // 文件名
- 
-                postfile(fileFormData).then(res => { // 上传请求
-                    this.fileName = ''; 
-
-              }
-                )*/
+          
               }
               }
               )
@@ -259,7 +268,7 @@ export default {
           this.listLoading = false
         })
         classList().then(response => {
-          this.classlist = response.data
+          this.classlist = response.value
         })
     },
      beforeUpload(file) {

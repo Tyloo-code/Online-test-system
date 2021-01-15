@@ -36,11 +36,11 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
-        <template>
+        <template slot-scope="scope">
           <!-- <router-link :to="'/example/edit/'+scope.row.id"> -->
           <el-button>编辑</el-button>
           <!-- </router-link> -->
-          <el-button>删除</el-button>
+          <el-button @click="handledelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
       <!-- <el-table-column class-name="status-col" label="Status" width="110" align="center">
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getList } from "@/api/table";
+import { getList, deletequiz } from "@/api/table";
 import { classList, coueseList } from "@/api/menu";
 export default {
   /*filters: {
@@ -86,6 +86,13 @@ export default {
     this.fetchData();
   },
   methods: {
+    handledelete(id) {
+      deletequiz(id).then(response => {
+        this.$message.success(`删除成功`)
+        this.fetchData()
+      })
+    },
+    handleSearch() {},
     fetchData() {
       this.listLoading = true;
       getList().then(response => {
@@ -95,8 +102,7 @@ export default {
       coueseList().then(response => {
         this.courselist = response.value;
       });
-    },
-    handleSearch() {}
+    }
   }
 };
 </script>
